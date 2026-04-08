@@ -67,7 +67,7 @@
 				
 				<option value="file5">github.com/Kiryadx/practice3_Ermakov/internal/patterns/strategy_div.go (100.0%)</option>
 				
-				<option value="file6">github.com/Kiryadx/practice3_Ermakov/internal/patterns/strategy_mul.go (0.0%)</option>
+				<option value="file6">github.com/Kiryadx/practice3_Ermakov/internal/patterns/strategy_mul.go (100.0%)</option>
 				
 				<option value="file7">github.com/Kiryadx/practice3_Ermakov/internal/patterns/strategy_pow.go (50.0%)</option>
 				
@@ -346,11 +346,11 @@ import "github.com/Kiryadx/practice3_Ermakov/internal/domain"
 
 type MulStrategy struct{}
 
-func (m *MulStrategy) Execute(x, y float64) (float64, error) <span class="cov0" title="0">{
+func (m *MulStrategy) Execute(x, y float64) (float64, error) <span class="cov10" title="5">{
         return x * y, nil
 }</span>
 
-func (m *MulStrategy) GetName() string <span class="cov0" title="0">{
+func (m *MulStrategy) GetName() string <span class="cov1" title="1">{
         return "mul"
 }</span>
 
