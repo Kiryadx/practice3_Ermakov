@@ -1,0 +1,79 @@
+@startuml component
+title Диаграмма компонентов - Калькулятор с плагинами
+
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8F5E9
+  BorderColor #2E7D32
+}
+skinparam package {
+  BackgroundColor #FFF9C4
+  BorderColor #F57F17
+  FontStyle bold
+}
+
+' Уровень CLI
+package "CLI Layer" {
+  [main.go] as Main
+  [flag parser] as FlagParser
+  [usage help] as Help
+  
+  Main --> FlagParser : использует
+  Main --> Help : использует
+}
+
+' Уровень приложения
+package "Application Layer" {
+  [Calculator] as Calculator
+  [OperationFactory] as OpFactory
+  [LoggingDecorator] as Logger
+}
+
+' Уровень стратегий (плагины)
+package "Strategy Layer" {
+  [Operation interface] as OpInterface <<interface>>
+  [AddStrategy] as Add
+  [SubStrategy] as Sub
+  [MulStrategy] as Mul
+  [DivStrategy] as Div
+  [PowStrategy] as Pow
+}
+
+' Уровень фабрик
+package "Factory Layer" {
+  [OperationCreator interface] as CreatorInterface <<interface>>
+  [AddCreator] as AddFact
+  [SubCreator] as SubFact
+  [MulCreator] as MulFact
+  [DivCreator] as DivFact
+  [PowCreator] as PowFact
+}
+
+' Связи между компонентами
+Main --> Calculator : вызывает
+
+Calculator --> OpFactory : использует
+Calculator --> Logger : использует
+
+OpFactory --> CreatorInterface : создаёт
+OpFactory --> AddFact : регистрирует
+OpFactory --> SubFact : регистрирует
+OpFactory --> MulFact : регистрирует
+OpFactory --> DivFact : регистрирует
+OpFactory --> PowFact : регистрирует
+
+AddFact ..> Add : создаёт
+SubFact ..> Sub : создаёт
+MulFact ..> Mul : создаёт
+DivFact ..> Div : создаёт
+PowFact ..> Pow : создаёт
+
+Add ..> OpInterface : реализует
+Sub ..> OpInterface : реализует
+Mul ..> OpInterface : реализует
+Div ..> OpInterface : реализует
+Pow ..> OpInterface : реализует
+
+Logger --> OpInterface : оборачивает
+
+@enduml

@@ -1,0 +1,139 @@
+@startuml class
+title Диаграмма классов - Калькулятор с плагинами
+
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #EBF5FB
+  BorderColor #2E75B6
+}
+skinparam interface {
+  BackgroundColor #F0F0F0
+  BorderColor #2E75B6
+}
+skinparam abstract {
+  BackgroundColor #FFF9C4
+  BorderColor #F57F17
+}
+
+' ========== STRATEGY ==========
+interface "Operation" as Operation <<interface>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+class "AddStrategy" as Add <<struct>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+class "SubStrategy" as Sub <<struct>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+class "MulStrategy" as Mul <<struct>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+class "DivStrategy" as Div <<struct>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+class "PowStrategy" as Pow <<struct>> {
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+' ========== FACTORY METHOD ==========
+interface "OperationFactory" as Factory <<interface>> {
+  +CreateOperation(name string) (Operation, error)
+  +RegisterOperation(name string, creator OperationCreator)
+}
+
+interface "OperationCreator" as Creator <<interface>> {
+  +Create() Operation
+}
+
+class "DefaultOperationFactory" as DefaultFactory <<struct>> {
+  -creators: map[string]OperationCreator
+  +CreateOperation(name string) (Operation, error)
+  +RegisterOperation(name string, creator OperationCreator)
+}
+
+class "AddCreator" as AddCreator <<struct>> {
+  +Create() Operation
+}
+
+class "SubCreator" as SubCreator <<struct>> {
+  +Create() Operation
+}
+
+class "MulCreator" as MulCreator <<struct>> {
+  +Create() Operation
+}
+
+class "DivCreator" as DivCreator <<struct>> {
+  +Create() Operation
+}
+
+class "PowCreator" as PowCreator <<struct>> {
+  +Create() Operation
+}
+
+' ========== DECORATOR ==========
+class "LoggingDecorator" as LogDecorator <<struct>> {
+  -wrapped: Operation
+  +Execute(a float64, b float64) (float64, error)
+  +GetName() string
+}
+
+' ========== CALCULATOR (CONTEXT) ==========
+class "Calculator" as Calculator <<struct>> {
+  -factory: OperationFactory
+  +Calculate(opName string, a float64, b float64) (float64, error)
+  +SetFactory(factory OperationFactory)
+}
+
+' ========== MAIN / CLI ==========
+class "CLI" as CLI <<struct>> {
+  +ParseFlags()
+  +Run()
+}
+
+' ========== ОТНОШЕНИЯ ==========
+' Strategy: реализация интерфейса
+Operation <|.. Add : реализует
+Operation <|.. Sub : реализует
+Operation <|.. Mul : реализует
+Operation <|.. Div : реализует
+Operation <|.. Pow : реализует
+
+' Factory Method
+Factory <|.. DefaultFactory : реализует
+OperationCreator <|.. AddCreator : реализует
+OperationCreator <|.. SubCreator : реализует
+OperationCreator <|.. MulCreator : реализует
+OperationCreator <|.. DivCreator : реализует
+OperationCreator <|.. PowCreator : реализует
+
+DefaultFactory --> OperationCreator : использует
+AddCreator ..> Add : создаёт
+SubCreator ..> Sub : создаёт
+MulCreator ..> Mul : создаёт
+DivCreator ..> Div : создаёт
+PowCreator ..> Pow : создаёт
+
+' Decorator
+Operation <|.. LogDecorator : реализует
+LogDecorator o-- Operation : оборачивает
+
+' Context
+Calculator --> OperationFactory : использует
+Calculator --> LogDecorator : может использовать
+
+' CLI
+CLI --> Calculator : использует
+
+@enduml

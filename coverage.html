@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>app: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">gitlab.com/biso-ermakovkirill/practice3/cmd/app/main.go (0.0%)</option>
+				
+				<option value="file1">gitlab.com/biso-ermakovkirill/practice3/internal/calculator/calculator.go (88.9%)</option>
+				
+				<option value="file2">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/decorator_logging.go (100.0%)</option>
+				
+				<option value="file3">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/factory.go (100.0%)</option>
+				
+				<option value="file4">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/strategy_add.go (100.0%)</option>
+				
+				<option value="file5">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/strategy_div.go (100.0%)</option>
+				
+				<option value="file6">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/strategy_mul.go (0.0%)</option>
+				
+				<option value="file7">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/strategy_pow.go (50.0%)</option>
+				
+				<option value="file8">gitlab.com/biso-ermakovkirill/practice3/internal/patterns/strategy_sub.go (50.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "flag"
+        "fmt"
+        "os"
+
+        "gitlab.com/biso-ermakovkirill/practice3/internal/calculator"
+)
+
+func main() <span class="cov0" title="0">{
+        var (
+                a       = flag.Float64("a", 0, "первое число")
+                b       = flag.Float64("b", 0, "второе число")
+                op      = flag.String("op", "", "операция (add, sub, mul, div, pow)")
+                logging = flag.Bool("log", false, "включить логирование")
+                help    = flag.Bool("h", false, "вывести справку")
+        )
+
+        flag.Usage = func() </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "Калькулятор с плагинами\n")
+                fmt.Fprintf(os.Stderr, "Использование: %s [опции]\n\n", os.Args[0])
+                fmt.Fprintf(os.Stderr, "Опции:\n")
+                flag.PrintDefaults()
+                fmt.Fprintf(os.Stderr, "\nПримеры:\n")
+                fmt.Fprintf(os.Stderr, "  %s -a 10 -b 5 -op add\n", os.Args[0])
+                fmt.Fprintf(os.Stderr, "  %s -a 10 -b 0 -op div\n", os.Args[0])
+                fmt.Fprintf(os.Stderr, "  %s -a 2 -b 3 -op pow -log\n", os.Args[0])
+        }</span>
+
+        <span class="cov0" title="0">flag.Parse()
+
+        if *help || flag.NFlag() == 0 </span><span class="cov0" title="0">{
+                flag.Usage()
+                os.Exit(0)
+        }</span>
+
+        <span class="cov0" title="0">if *op == "" </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "Ошибка: не указана операция (-op)\n")
+                flag.Usage()
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">calc := calculator.NewCalculator(*logging)
+
+        result, err := calc.Calculate(*op, *a, *b)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "Ошибка: %v\n", err)
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Printf("Результат: %.2f %s %.2f = %.2f\n", *a, *op, *b, result)</span>
+}</pre>
+		
+		<pre class="file" id="file1" style="display: none">package calculator
+
+import (
+        "gitlab.com/biso-ermakovkirill/practice3/internal/patterns"
+)
+
+// Calculator — контекст, использующий стратегии
+type Calculator struct {
+        factory       patterns.OperationFactory
+        enableLogging bool
+}
+
+// NewCalculator создаёт новый калькулятор
+func NewCalculator(enableLogging bool) *Calculator <span class="cov8" title="1">{
+        return &amp;Calculator{
+                factory:       patterns.NewDefaultFactory(),
+                enableLogging: enableLogging,
+        }
+}</span>
+
+// Calculate выполняет операцию с заданным именем
+func (c *Calculator) Calculate(opName string, a, b float64) (float64, error) <span class="cov8" title="1">{
+        // Фабричный метод создаёт стратегию
+        op, err := c.factory.CreateOperation(opName)
+        if err != nil </span><span class="cov8" title="1">{
+                return 0, err
+        }</span>
+
+        // Если логирование включено — оборачиваем стратегию в декоратор
+        <span class="cov8" title="1">if c.enableLogging </span><span class="cov8" title="1">{
+                op = patterns.NewLoggingDecorator(op)
+        }</span>
+
+        // Выполняем операцию
+        <span class="cov8" title="1">return op.Execute(a, b)</span>
+}
+
+// SetEnableLogging включает/выключает логирование
+func (c *Calculator) SetEnableLogging(enabled bool) <span class="cov0" title="0">{
+        c.enableLogging = enabled
+}</span>
+
+// GetAvailableOperations возвращает список доступных операций
+func (c *Calculator) GetAvailableOperations() []string <span class="cov8" title="1">{
+        return []string{"add", "sub", "mul", "div", "pow"}
+}</pre>
+		
+		<pre class="file" id="file2" style="display: none">package patterns
+
+import (
+        "fmt"
+        "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+)
+
+// LoggingDecorator — паттерн Decorator для добавления логирования
+type LoggingDecorator struct {
+        wrapped domain.Operation
+}
+
+// NewLoggingDecorator создаёт обёртку с логированием
+func NewLoggingDecorator(op domain.Operation) *LoggingDecorator <span class="cov8" title="1">{
+        return &amp;LoggingDecorator{wrapped: op}
+}</span>
+
+func (l *LoggingDecorator) Execute(a, b float64) (float64, error) <span class="cov8" title="1">{
+        fmt.Printf("[LOG] Вызов: %s(%.2f, %.2f)\n", l.wrapped.GetName(), a, b)
+
+        result, err := l.wrapped.Execute(a, b)
+
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Printf("[LOG] Ошибка: %v\n", err)
+        }</span> else<span class="cov8" title="1"> {
+                fmt.Printf("[LOG] Результат: %.2f\n", result)
+        }</span>
+
+        <span class="cov8" title="1">return result, err</span>
+}
+
+func (l *LoggingDecorator) GetName() string <span class="cov8" title="1">{
+        return l.wrapped.GetName()
+}</span>
+
+// Ensure LoggingDecorator implements domain.Operation
+var _ domain.Operation = (*LoggingDecorator)(nil)</pre>
+		
+		<pre class="file" id="file3" style="display: none">package patterns
+
+import (
+        "fmt"
+        "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+)
+
+// OperationCreator — интерфейс создателя стратегии
+type OperationCreator interface {
+        Create() domain.Operation
+}
+
+// OperationFactory — интерфейс фабрики
+type OperationFactory interface {
+        CreateOperation(name string) (domain.Operation, error)
+        RegisterOperation(name string, creator OperationCreator)
+}
+
+// DefaultFactory — конкретная фабрика
+type DefaultFactory struct {
+        creators map[string]OperationCreator
+}
+
+// NewDefaultFactory создаёт фабрику с предустановленными операциями
+func NewDefaultFactory() *DefaultFactory <span class="cov8" title="1">{
+        f := &amp;DefaultFactory{
+                creators: make(map[string]OperationCreator),
+        }
+        f.registerDefaultOperations()
+        return f
+}</span>
+
+func (f *DefaultFactory) registerDefaultOperations() <span class="cov8" title="1">{
+        f.RegisterOperation("add", &amp;AddCreator{})
+        f.RegisterOperation("sub", &amp;SubCreator{})
+        f.RegisterOperation("mul", &amp;MulCreator{})
+        f.RegisterOperation("div", &amp;DivCreator{})
+        f.RegisterOperation("pow", &amp;PowCreator{})
+}</span>
+
+func (f *DefaultFactory) RegisterOperation(name string, creator OperationCreator) <span class="cov8" title="1">{
+        f.creators[name] = creator
+}</span>
+
+func (f *DefaultFactory) CreateOperation(name string) (domain.Operation, error) <span class="cov8" title="1">{
+        creator, exists := f.creators[name]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("неизвестная операция: %s", name)
+        }</span>
+        <span class="cov8" title="1">return creator.Create(), nil</span>
+}
+
+// Конкретные создатели
+type AddCreator struct{}
+func (c *AddCreator) Create() domain.Operation <span class="cov8" title="1">{ return &amp;AddStrategy{} }</span>
+
+type SubCreator struct{}
+func (c *SubCreator) Create() domain.Operation <span class="cov8" title="1">{ return &amp;SubStrategy{} }</span>
+
+type MulCreator struct{}
+func (c *MulCreator) Create() domain.Operation <span class="cov8" title="1">{ return &amp;MulStrategy{} }</span>
+
+type DivCreator struct{}
+func (c *DivCreator) Create() domain.Operation <span class="cov8" title="1">{ return &amp;DivStrategy{} }</span>
+
+type PowCreator struct{}
+func (c *PowCreator) Create() domain.Operation <span class="cov8" title="1">{ return &amp;PowStrategy{} }</pre>
+		
+		<pre class="file" id="file4" style="display: none">package patterns
+
+import "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+
+type AddStrategy struct{}
+
+func (a *AddStrategy) Execute(x, y float64) (float64, error) <span class="cov8" title="1">{
+        return x + y, nil
+}</span>
+
+func (a *AddStrategy) GetName() string <span class="cov8" title="1">{
+        return "add"
+}</span>
+
+// Ensure AddStrategy implements domain.Operation
+var _ domain.Operation = (*AddStrategy)(nil)</pre>
+		
+		<pre class="file" id="file5" style="display: none">package patterns
+
+import (
+        "fmt"
+        "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+)
+
+type DivStrategy struct{}
+
+func (d *DivStrategy) Execute(x, y float64) (float64, error) <span class="cov8" title="1">{
+        if y == 0 </span><span class="cov8" title="1">{
+                return 0, fmt.Errorf("деление на ноль")
+        }</span>
+        <span class="cov8" title="1">return x / y, nil</span>
+}
+
+func (d *DivStrategy) GetName() string <span class="cov8" title="1">{
+        return "div"
+}</span>
+
+var _ domain.Operation = (*DivStrategy)(nil)</pre>
+		
+		<pre class="file" id="file6" style="display: none">package patterns
+
+import "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+
+type MulStrategy struct{}
+
+func (m *MulStrategy) Execute(x, y float64) (float64, error) <span class="cov0" title="0">{
+        return x * y, nil
+}</span>
+
+func (m *MulStrategy) GetName() string <span class="cov0" title="0">{
+        return "mul"
+}</span>
+
+var _ domain.Operation = (*MulStrategy)(nil)</pre>
+		
+		<pre class="file" id="file7" style="display: none">package patterns
+
+import (
+        "math"
+        "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+)
+
+type PowStrategy struct{}
+
+func (p *PowStrategy) Execute(x, y float64) (float64, error) <span class="cov8" title="1">{
+        return math.Pow(x, y), nil
+}</span>
+
+func (p *PowStrategy) GetName() string <span class="cov0" title="0">{
+        return "pow"
+}</span>
+
+var _ domain.Operation = (*PowStrategy)(nil)</pre>
+		
+		<pre class="file" id="file8" style="display: none">package patterns
+
+import "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+
+type SubStrategy struct{}
+
+func (s *SubStrategy) Execute(x, y float64) (float64, error) <span class="cov8" title="1">{
+        return x - y, nil
+}</span>
+
+func (s *SubStrategy) GetName() string <span class="cov0" title="0">{
+        return "sub"
+}</span>
+
+var _ domain.Operation = (*SubStrategy)(nil)</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

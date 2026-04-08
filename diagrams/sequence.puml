@@ -1,0 +1,62 @@
+@startuml sequence
+title Диаграмма последовательности - Вычисление операции деления
+
+skinparam sequenceMessageAlign center
+
+actor "Пользователь" as User
+participant "main/CLI" as CLI
+participant "Calculator" as Calc
+participant "OperationFactory" as Factory
+participant "LoggingDecorator" as Decorator
+participant "DivStrategy" as Div
+
+User -> CLI : ./calc -a 10 -b 2 -op div
+activate CLI
+
+CLI -> CLI : flag.Parse()
+note right: Чтение флагов:\na=10, b=2, op="div"
+
+CLI -> Calc : Calculate("div", 10, 2)
+activate Calc
+
+Calc -> Factory : CreateOperation("div")
+activate Factory
+
+Factory -> Factory : ищет "div" в карте creators
+Factory --> Calc : DivStrategy
+deactivate Factory
+
+Calc -> Decorator : new LoggingDecorator(DivStrategy)
+activate Decorator
+
+note right of Decorator
+  Decorator оборачивает
+  DivStrategy для логирования
+end note
+
+Calc -> Decorator : Execute(10, 2)
+activate Decorator
+
+Decorator -> Decorator : вывод лога
+note right: [LOG] Вызов: div(10, 2)
+
+Decorator -> Div : Execute(10, 2)
+activate Div
+
+Div -> Div : return 10 / 2 = 5
+Div --> Decorator : 5, nil
+deactivate Div
+
+Decorator -> Decorator : вывод результата
+note right: [LOG] Результат: 5
+
+Decorator --> Calc : 5, nil
+deactivate Decorator
+
+Calc --> CLI : 5, nil
+deactivate Calc
+
+CLI --> User : "Результат: 10 / 2 = 5"
+deactivate CLI
+
+@enduml
