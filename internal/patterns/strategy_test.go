@@ -113,3 +113,35 @@ func TestPowStrategy(t *testing.T) {
 		})
 	}
 }
+
+func TestMulStrategy(t *testing.T) {
+	strategy := &MulStrategy{}
+
+	tests := []struct {
+		name string
+		a, b float64
+		want float64
+	}{
+		{"positive", 2, 3, 6},
+		{"negative", -2, 3, -6},
+		{"negative both", -2, -3, 6},
+		{"zero", 0, 5, 0},
+		{"zero both", 0, 0, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := strategy.Execute(tt.a, tt.b)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("Execute(%f, %f) = %f, want %f", tt.a, tt.b, got, tt.want)
+			}
+		})
+	}
+
+	if strategy.GetName() != "mul" {
+		t.Errorf("GetName() = %s, want mul", strategy.GetName())
+	}
+}
