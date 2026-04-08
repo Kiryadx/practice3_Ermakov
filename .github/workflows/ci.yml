@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  # Стадия 1: Линтинг и статический анализ
+  lint:
+    name: Lint & Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Run gosec (security check)
+        uses: securego/gosec@master
+        with:
+          args: ./...
+
+  # Стадия 2: Тестирование
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run tests with race detector and coverage
+        run: |
+          go test -v -race -coverprofile=coverage.out ./internal/... ./cmd/...
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.out
+
+  # Стадия 3: Сборка
+  build:
+    name: Build Binary
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build calculator
+        run: |
+          cd practice3_Ermakov
+          go build -o calculator ./cmd/app
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-binary
+          path: practice3_Ermakov/calculator
