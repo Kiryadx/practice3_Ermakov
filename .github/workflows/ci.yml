@@ -7,7 +7,7 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  # Стадия 1: Линтинг и статический анализ
+  # Стадия 1: Линтинг и безопасность
   lint:
     name: Lint & Security
     runs-on: ubuntu-latest
@@ -44,6 +44,9 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Download dependencies
+        run: go mod download
+
       - name: Run tests with race detector and coverage
         run: |
           go test -v -race -coverprofile=coverage.out ./internal/... ./cmd/...
@@ -54,7 +57,7 @@ jobs:
           name: coverage-report
           path: coverage.out
 
-  # Стадия 3: Сборка
+  # Стадия 3: Сборка бинарного файла
   build:
     name: Build Binary
     runs-on: ubuntu-latest
@@ -69,12 +72,10 @@ jobs:
           go-version: '1.21'
 
       - name: Build calculator
-        run: |
-          cd practice3_Ermakov
-          go build -o calculator ./cmd/app
+        run: go build -o calculator ./cmd/app
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: calculator-binary
-          path: practice3_Ermakov/calculator
+          path: calculator
