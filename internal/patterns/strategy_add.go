@@ -1,6 +1,6 @@
 package patterns
 
-import "gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+import "github.com/Kiryadx/practice3_Ermakov/internal/domain"
 
 type AddStrategy struct{}
 

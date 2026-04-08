@@ -1,7 +1,7 @@
 package calculator
 
 import (
-	"gitlab.com/biso-ermakovkirill/practice3/internal/patterns"
+	"github.com/Kiryadx/practice3_Ermakov/internal/patterns"
 )
 
 // Calculator — контекст, использующий стратегии

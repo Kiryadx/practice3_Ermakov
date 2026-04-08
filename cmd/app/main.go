@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.com/biso-ermakovkirill/practice3/internal/calculator"
+	"github.com/Kiryadx/practice3_Ermakov/internal/calculator"
 )
 
 func main() {

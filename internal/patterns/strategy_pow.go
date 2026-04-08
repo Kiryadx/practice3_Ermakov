@@ -2,7 +2,7 @@ package patterns
 
 import (
 	"math"
-	"gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+	"github.com/Kiryadx/practice3_Ermakov/internal/domain"
 )
 
 type PowStrategy struct{}

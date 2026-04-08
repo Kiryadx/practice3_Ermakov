@@ -2,7 +2,7 @@ package patterns
 
 import (
 	"fmt"
-	"gitlab.com/biso-ermakovkirill/practice3/internal/domain"
+	"github.com/Kiryadx/practice3_Ermakov/internal/domain"
 )
 
 // LoggingDecorator — паттерн Decorator для добавления логирования

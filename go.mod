@@ -1,3 +1,3 @@
-module gitlab.com/biso-ermakovkirill/practice3
+module github.com/Kiryadx/practice3_Ermakov
 
-go 1.26.1
+go 1.24
